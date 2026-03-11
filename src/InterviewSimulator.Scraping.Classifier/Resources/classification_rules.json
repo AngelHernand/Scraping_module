@@ -1,0 +1,147 @@
+{
+  "categories": {
+    "Technical": {
+      "keywords": [
+        "algorithm", "algoritmo", "data structure", "estructura de datos",
+        "code", "código", "program", "programar", "function", "función",
+        "API", "REST", "GraphQL", "SQL", "query", "database", "base de datos",
+        "OOP", "inheritance", "herencia", "polymorphism", "polimorfismo",
+        "design pattern", "patrón de diseño", "SOLID",
+        "array", "linked list", "tree", "graph", "hash",
+        "sorting", "searching", "recursion", "recursividad",
+        "complexity", "complejidad", "Big O", "O(n)",
+        "HTTP", "TCP", "UDP", "DNS", "IP", "network", "red",
+        "thread", "concurrency", "concurrencia", "async", "parallel",
+        "Docker", "Kubernetes", "CI/CD", "Git", "DevOps",
+        "cloud", "AWS", "Azure", "microservices", "microservicios",
+        "testing", "unit test", "TDD",
+        "implement", "implementar", "write", "escribir", "build", "construir",
+        "optimize", "optimizar", "debug", "depurar",
+        "framework", ".NET", "React", "Angular", "Node",
+        "Python", "Java", "C#", "JavaScript", "TypeScript",
+        "operating system", "sistema operativo", "process", "proceso",
+        "memory", "memoria", "CPU", "cache"
+      ],
+      "patterns": [
+        "(?i)(write|implement|code|build|create)\\s+(a|an|the)?\\s*\\w+",
+        "(?i)what\\s+is\\s+(the\\s+)?(difference|diferencia)\\s+between",
+        "(?i)(explain|explica)\\s+(how|cómo|what|qué)",
+        "(?i)how\\s+(would|do)\\s+you\\s+(implement|optimize|design|build)",
+        "(?i)what\\s+(is|are)\\s+(the\\s+)?(time|space)\\s+complexity",
+        "(?i)(describe|describe)\\s+(the\\s+)?(architecture|arquitectura)"
+      ]
+    },
+    "Behavioral": {
+      "keywords": [
+        "tell me about a time", "cuéntame de una vez",
+        "describe a situation", "describe una situación",
+        "give an example", "da un ejemplo",
+        "how did you handle", "cómo manejaste",
+        "conflict", "conflicto", "disagreement", "desacuerdo",
+        "teamwork", "trabajo en equipo", "team", "equipo",
+        "challenge", "desafío", "reto", "obstacle", "obstáculo",
+        "failure", "fracaso", "mistake", "error",
+        "leadership", "liderazgo", "lead", "liderar",
+        "feedback", "retroalimentación",
+        "pressure", "presión", "deadline", "fecha límite",
+        "achievement", "logro", "proud", "orgulloso",
+        "motivation", "motivación", "strength", "fortaleza",
+        "weakness", "debilidad", "improve", "mejorar"
+      ],
+      "patterns": [
+        "(?i)tell\\s+me\\s+about\\s+a\\s+time",
+        "(?i)describe\\s+a\\s+(time|situation|moment)",
+        "(?i)give\\s+(me\\s+)?an?\\s+example\\s+of",
+        "(?i)how\\s+(did|do|would)\\s+you\\s+(handle|deal|manage|cope)",
+        "(?i)what\\s+(is|are)\\s+your\\s+(greatest\\s+)?(strength|weakness)",
+        "(?i)cuéntame\\s+(de|sobre)\\s+una\\s+(vez|ocasión|situación)",
+        "(?i)have\\s+you\\s+ever\\s+(faced|dealt|experienced)"
+      ]
+    },
+    "Situational": {
+      "keywords": [
+        "what would you do", "qué harías",
+        "how would you handle", "cómo manejarías",
+        "imagine", "imagina", "suppose", "supón",
+        "hypothetical", "hipotético",
+        "if you were", "si fueras", "si tuvieras",
+        "scenario", "escenario",
+        "what if", "qué pasaría si",
+        "how would you approach", "cómo abordarías",
+        "what steps would you take", "qué pasos tomarías"
+      ],
+      "patterns": [
+        "(?i)what\\s+would\\s+you\\s+do\\s+if",
+        "(?i)how\\s+would\\s+you\\s+(approach|handle|respond|react)",
+        "(?i)imagine\\s+(you|that|a\\s+scenario)",
+        "(?i)if\\s+you\\s+(were|had|could|found)",
+        "(?i)suppose\\s+(you|your|a)",
+        "(?i)qué\\s+harías\\s+si",
+        "(?i)cómo\\s+(abordarías|manejarías|resolverías)"
+      ]
+    },
+    "General": {
+      "keywords": [
+        "tell me about yourself", "háblame de ti",
+        "why this company", "por qué esta empresa",
+        "why should we hire", "por qué deberíamos contratarte",
+        "where do you see yourself", "dónde te ves",
+        "salary", "salario", "compensation", "compensación",
+        "career goals", "metas profesionales",
+        "why did you leave", "por qué dejaste",
+        "what do you know about", "qué sabes de",
+        "why are you interested", "por qué te interesa",
+        "walk me through your resume", "recorre tu currículum"
+      ],
+      "patterns": [
+        "(?i)tell\\s+me\\s+about\\s+yourself",
+        "(?i)why\\s+(should\\s+we|do\\s+you\\s+want\\s+to)",
+        "(?i)where\\s+do\\s+you\\s+see\\s+yourself",
+        "(?i)what\\s+(are|is)\\s+your\\s+(salary|career|goal)",
+        "(?i)háblame\\s+de\\s+ti",
+        "(?i)por\\s+qué\\s+(esta|deberíamos|te\\s+interesa)"
+      ]
+    }
+  },
+  "subcategories": {
+    "Technical": {
+      "Algoritmos y Estructuras de Datos": ["algorithm", "data structure", "sorting", "searching", "tree", "graph", "array", "linked list", "hash", "stack", "queue", "heap", "recursion", "dynamic programming", "Big O", "complexity"],
+      "Bases de Datos": ["SQL", "database", "query", "JOIN", "normalization", "index", "transaction", "ACID", "NoSQL", "MongoDB", "PostgreSQL", "MySQL", "stored procedure", "trigger"],
+      "Redes y Sistemas": ["network", "TCP", "UDP", "HTTP", "HTTPS", "DNS", "IP", "firewall", "load balancer", "proxy", "OSI", "subnet", "routing", "socket"],
+      "Desarrollo Web": ["HTML", "CSS", "JavaScript", "React", "Angular", "Vue", "Node", "REST", "API", "frontend", "backend", "full stack", "responsive", "SPA", "SSR"],
+      "Desarrollo Backend": [".NET", "C#", "Java", "Python", "Spring", "Django", "Flask", "ASP.NET", "microservices", "middleware", "authentication", "authorization"],
+      "DevOps y Cloud": ["Docker", "Kubernetes", "CI/CD", "AWS", "Azure", "GCP", "Jenkins", "Terraform", "monitoring", "deployment", "container", "orchestration"],
+      "Sistemas Operativos": ["process", "thread", "memory", "CPU", "scheduling", "deadlock", "mutex", "semaphore", "file system", "virtual memory", "kernel"],
+      "Ingeniería de Software": ["design pattern", "SOLID", "clean code", "architecture", "agile", "scrum", "TDD", "code review", "refactoring", "technical debt"],
+      "Programación General": ["OOP", "functional", "inheritance", "polymorphism", "abstraction", "encapsulation", "interface", "generic", "exception", "debugging"]
+    }
+  },
+  "difficulty_indicators": {
+    "Junior": ["basic", "what is", "explain", "define", "simple", "beginner", "fundamental", "introduction", "qué es", "explica", "define", "básico"],
+    "Mid": ["implement", "design", "compare", "optimize", "trade-off", "when would you", "how do you decide", "implementa", "diseña", "compara"],
+    "Senior": ["architect", "scale", "distributed", "system design", "lead", "mentor", "strategy", "trade-offs at scale", "high availability", "fault tolerance", "arquitectura", "escala", "distribuido"]
+  },
+  "technology_mappings": {
+    "Java": ["java", "spring", "spring boot", "jvm", "maven", "gradle", "hibernate", "jpa", "servlet", "tomcat", "junit", "java ee", "jakarta"],
+    "C#": ["c#", "csharp", ".net", "asp.net", "entity framework", "linq", "blazor", "wpf", "xamarin", "maui", "nuget", "roslyn"],
+    "Python": ["python", "django", "flask", "fastapi", "pandas", "numpy", "pip", "pytest", "pep", "jupyter", "tensorflow", "pytorch"],
+    "JavaScript": ["javascript", "js", "node", "nodejs", "express", "npm", "yarn", "typescript", "es6", "v8", "deno", "bun"],
+    "React": ["react", "reactjs", "jsx", "redux", "next.js", "nextjs", "react native", "hooks", "usestate", "useeffect"],
+    "Angular": ["angular", "angularjs", "rxjs", "ngrx", "ng", "directive", "angular cli"],
+    "Vue": ["vue", "vuejs", "vuex", "nuxt", "pinia", "composition api"],
+    "SQL": ["sql", "mysql", "postgresql", "sql server", "oracle db", "stored procedure", "trigger", "join", "subquery", "normalization", "t-sql", "plsql"],
+    "NoSQL": ["nosql", "mongodb", "cassandra", "redis", "dynamodb", "couchdb", "firebase", "firestore", "neo4j"],
+    "AWS": ["aws", "amazon web services", "ec2", "s3", "lambda", "dynamodb", "cloudformation", "sqs", "sns", "ecs", "eks"],
+    "Azure": ["azure", "azure devops", "azure functions", "cosmos db", "blob storage", "app service", "aks"],
+    "Docker": ["docker", "dockerfile", "docker-compose", "container", "containerization"],
+    "Kubernetes": ["kubernetes", "k8s", "helm", "kubectl", "pod", "deployment", "service mesh", "istio"],
+    "Go": ["golang", "go lang", "goroutine", "go module"],
+    "Rust": ["rust", "cargo", "ownership", "borrow checker"],
+    "PHP": ["php", "laravel", "symfony", "wordpress", "composer"],
+    "Ruby": ["ruby", "rails", "ruby on rails", "gem", "bundler"],
+    "Swift": ["swift", "swiftui", "uikit", "xcode", "cocoapods"],
+    "Kotlin": ["kotlin", "ktor", "coroutine", "android"],
+    "DevOps": ["ci/cd", "jenkins", "github actions", "gitlab ci", "terraform", "ansible", "devops"],
+    "Data Science": ["machine learning", "deep learning", "data science", "nlp", "computer vision", "model training", "neural network"]
+  }
+}

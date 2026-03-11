@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-InterviewSimulator.Scraping.Worker-1d6b5fe2-4dbc-42d0-aa0e-a099470c73b8</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cronos" Version="0.11.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.*">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="Serilog" Version="4.3.1" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InterviewSimulator.Scraping.Core\InterviewSimulator.Scraping.Core.csproj" />
+    <ProjectReference Include="..\InterviewSimulator.Scraping.Scrapers\InterviewSimulator.Scraping.Scrapers.csproj" />
+    <ProjectReference Include="..\InterviewSimulator.Scraping.Classifier\InterviewSimulator.Scraping.Classifier.csproj" />
+    <ProjectReference Include="..\InterviewSimulator.Scraping.Data\InterviewSimulator.Scraping.Data.csproj" />
+  </ItemGroup>
+</Project>
