@@ -15,16 +15,23 @@ public class IndeedScraper : BaseScraper
 {
     private static readonly string[] ArticleUrls =
     {
-        // Solo URLs en español — sitios de Indeed México y España
+        // URLs en español — Indeed México y España
         "https://mx.indeed.com/orientacion-profesional/entrevistas/preguntas-entrevista-ingeniero-software",
         "https://mx.indeed.com/orientacion-profesional/entrevistas/preguntas-entrevista-desarrollador",
         "https://mx.indeed.com/orientacion-profesional/entrevistas/preguntas-frecuentes-entrevista-trabajo",
         "https://es.indeed.com/orientacion-profesional/entrevistas/preguntas-frecuentes-entrevista-trabajo",
         "https://es.indeed.com/orientacion-profesional/entrevistas/preguntas-entrevista-programador",
-        "https://mx.indeed.com/orientacion-profesional/entrevistas/preguntas-entrevista-tecnica"
+        "https://mx.indeed.com/orientacion-profesional/entrevistas/preguntas-entrevista-tecnica",
+        // URLs en inglés — Indeed US
+        "https://www.indeed.com/career-advice/interviewing/software-engineer-interview-questions",
+        "https://www.indeed.com/career-advice/interviewing/technical-interview-questions",
+        "https://www.indeed.com/career-advice/interviewing/computer-science-interview-questions",
+        "https://www.indeed.com/career-advice/interviewing/web-developer-interview-questions",
+        "https://www.indeed.com/career-advice/interviewing/back-end-developer-interview-questions",
+        "https://www.indeed.com/career-advice/interviewing/programming-interview-questions",
+        "https://www.indeed.com/career-advice/interviewing/database-interview-questions",
+        "https://www.indeed.com/career-advice/interviewing/sql-interview-questions"
     };
-
-    private const bool SpanishOnly = true;
 
     public override string SourceName => "Indeed";
     public override SourceType SourceType => SourceType.JobBoard;
@@ -91,14 +98,6 @@ public class IndeedScraper : BaseScraper
                     if (string.IsNullOrWhiteSpace(articleContent))
                     {
                         Logger.LogWarning("[Indeed] No se encontró contenido en: {Url}", articleUrl);
-                        await page.CloseAsync();
-                        continue;
-                    }
-
-                    // Filtrar por idioma: solo español
-                    if (SpanishOnly && !IsSpanishText(articleContent))
-                    {
-                        Logger.LogDebug("[Indeed] Artículo descartado (no es español): {Url}", articleUrl);
                         await page.CloseAsync();
                         continue;
                     }

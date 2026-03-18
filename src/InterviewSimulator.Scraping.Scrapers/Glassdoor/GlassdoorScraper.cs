@@ -20,16 +20,17 @@ public class GlassdoorScraper : BaseScraper
         "https://www.glassdoor.com.mx/Entrevista/ingeniero-de-software-preguntas-de-entrevista-SRCH_KO0,22.htm",
         "https://www.glassdoor.com.mx/Entrevista/desarrollador-backend-preguntas-de-entrevista-SRCH_KO0,21.htm",
         "https://www.glassdoor.com.mx/Entrevista/desarrollador-full-stack-preguntas-de-entrevista-SRCH_KO0,24.htm",
-        // Glassdoor en inglés (fallback, se filtran por idioma)
+        // Glassdoor en inglés
         "https://www.glassdoor.com/Interview/software-engineer-interview-questions-SRCH_KO0,17.htm",
         "https://www.glassdoor.com/Interview/backend-developer-interview-questions-SRCH_KO0,17.htm",
         "https://www.glassdoor.com/Interview/full-stack-developer-interview-questions-SRCH_KO0,20.htm",
         "https://www.glassdoor.com/Interview/devops-engineer-interview-questions-SRCH_KO0,15.htm",
         "https://www.glassdoor.com/Interview/data-engineer-interview-questions-SRCH_KO0,13.htm",
-        "https://www.glassdoor.com/Interview/systems-engineer-interview-questions-SRCH_KO0,16.htm"
+        "https://www.glassdoor.com/Interview/systems-engineer-interview-questions-SRCH_KO0,16.htm",
+        "https://www.glassdoor.com/Interview/frontend-developer-interview-questions-SRCH_KO0,18.htm",
+        "https://www.glassdoor.com/Interview/database-administrator-interview-questions-SRCH_KO0,22.htm",
+        "https://www.glassdoor.com/Interview/cloud-engineer-interview-questions-SRCH_KO0,14.htm"
     };
-
-    private const bool SpanishOnly = true;
 
     private static int _consecutiveFailures;
     private static DateTime? _disabledUntil;
@@ -154,9 +155,6 @@ public class GlassdoorScraper : BaseScraper
                     {
                         foreach (var questionText in questionsHtml)
                         {
-                            // Filtrar por idioma: solo español
-                            if (SpanishOnly && !IsSpanishText(questionText)) continue;
-
                             if (IsValidQuestion(questionText))
                             {
                                 var scrapedQuestion = CreateScrapedQuestion(

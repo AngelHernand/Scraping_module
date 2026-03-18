@@ -1,0 +1,18 @@
+{
+  "solution": {
+    "path": "Web-scraping_module.sln",
+    "projects": [
+      "src\\InterviewSimulator.Scraping.Core\\InterviewSimulator.Scraping.Core.csproj",
+      "src\\InterviewSimulator.Scraping.Data\\InterviewSimulator.Scraping.Data.csproj",
+      "src\\InterviewSimulator.RAG.Core\\InterviewSimulator.RAG.Core.csproj",
+      "src\\InterviewSimulator.RAG.Data\\InterviewSimulator.RAG.Data.csproj",
+      "src\\InterviewSimulator.RAG.Processing\\InterviewSimulator.RAG.Processing.csproj",
+      "src\\InterviewSimulator.RAG.Embedding\\InterviewSimulator.RAG.Embedding.csproj",
+      "src\\InterviewSimulator.RAG.VectorStore\\InterviewSimulator.RAG.VectorStore.csproj",
+      "src\\InterviewSimulator.RAG.Retrieval\\InterviewSimulator.RAG.Retrieval.csproj",
+      "src\\InterviewSimulator.RAG.Worker\\InterviewSimulator.RAG.Worker.csproj",
+      "src\\InterviewSimulator.Scraping.Classifier\\InterviewSimulator.Scraping.Classifier.csproj",
+      "tests\\InterviewSimulator.RAG.Tests.Unit\\InterviewSimulator.RAG.Tests.Unit.csproj"
+    ]
+  }
+}

@@ -10,41 +10,62 @@ using Microsoft.Extensions.Options;
 namespace InterviewSimulator.Scraping.Scrapers.FreeCodeCamp;
 
 /// <summary>
-/// Scraper para FreeCodeCamp en Español (freecodecamp.org/espanol).
-/// Todo el contenido ya está en español, no requiere filtro de idioma.
+/// Scraper para FreeCodeCamp en Español e Inglés.
 /// Usa HttpClient + HtmlAgilityPack (contenido estático, sin JavaScript).
 /// </summary>
 public class FreeCodeCampScraper : BaseScraper
 {
-    private const string BaseUrl = "https://www.freecodecamp.org/espanol/news";
+    private const string BaseUrlEs = "https://www.freecodecamp.org/espanol/news";
+    private const string BaseUrlEn = "https://www.freecodecamp.org/news";
 
     // Páginas de búsqueda con términos relevantes para entrevistas técnicas
     private static readonly string[] SearchUrls =
     {
-        $"{BaseUrl}/search/?query=preguntas+entrevista",
-        $"{BaseUrl}/search/?query=entrevista+programacion",
-        $"{BaseUrl}/search/?query=preguntas+tecnicas",
-        $"{BaseUrl}/search/?query=entrevista+desarrollador",
-        $"{BaseUrl}/search/?query=preguntas+javascript",
-        $"{BaseUrl}/search/?query=preguntas+python",
-        $"{BaseUrl}/search/?query=preguntas+sql",
-        $"{BaseUrl}/search/?query=preguntas+react",
-        $"{BaseUrl}/search/?query=algoritmos+estructuras+datos",
-        $"{BaseUrl}/search/?query=preparar+entrevista+tecnica"
+        // Español
+        $"{BaseUrlEs}/search/?query=preguntas+entrevista",
+        $"{BaseUrlEs}/search/?query=entrevista+programacion",
+        $"{BaseUrlEs}/search/?query=preguntas+tecnicas",
+        $"{BaseUrlEs}/search/?query=entrevista+desarrollador",
+        $"{BaseUrlEs}/search/?query=preguntas+javascript",
+        $"{BaseUrlEs}/search/?query=preguntas+python",
+        $"{BaseUrlEs}/search/?query=preguntas+sql",
+        $"{BaseUrlEs}/search/?query=preguntas+react",
+        $"{BaseUrlEs}/search/?query=algoritmos+estructuras+datos",
+        $"{BaseUrlEs}/search/?query=preparar+entrevista+tecnica",
+        // Inglés
+        $"{BaseUrlEn}/search/?query=interview+questions+programming",
+        $"{BaseUrlEn}/search/?query=coding+interview",
+        $"{BaseUrlEn}/search/?query=technical+interview+questions",
+        $"{BaseUrlEn}/search/?query=javascript+interview",
+        $"{BaseUrlEn}/search/?query=python+interview",
+        $"{BaseUrlEn}/search/?query=sql+interview+questions",
+        $"{BaseUrlEn}/search/?query=react+interview",
+        $"{BaseUrlEn}/search/?query=algorithms+data+structures"
     };
 
     // URLs directas de artículos conocidos con preguntas de entrevista
     private static readonly string[] DirectArticleUrls =
     {
-        $"{BaseUrl}/preguntas-comunes-en-entrevistas-tecnicas/",
-        $"{BaseUrl}/preguntas-tipicas-de-entrevista-de-javascript/",
-        $"{BaseUrl}/preguntas-de-entrevista-de-python/",
-        $"{BaseUrl}/preguntas-de-entrevista-de-react/",
-        $"{BaseUrl}/preguntas-de-entrevista-de-sql/",
-        $"{BaseUrl}/preguntas-de-entrevista-sobre-css/",
-        $"{BaseUrl}/preguntas-de-entrevista-sobre-html/",
-        $"{BaseUrl}/preguntas-de-entrevistas-de-angular/",
-        $"{BaseUrl}/preguntas-de-entrevista-de-java/"
+        // Español
+        $"{BaseUrlEs}/preguntas-comunes-en-entrevistas-tecnicas/",
+        $"{BaseUrlEs}/preguntas-tipicas-de-entrevista-de-javascript/",
+        $"{BaseUrlEs}/preguntas-de-entrevista-de-python/",
+        $"{BaseUrlEs}/preguntas-de-entrevista-de-react/",
+        $"{BaseUrlEs}/preguntas-de-entrevista-de-sql/",
+        $"{BaseUrlEs}/preguntas-de-entrevista-sobre-css/",
+        $"{BaseUrlEs}/preguntas-de-entrevista-sobre-html/",
+        $"{BaseUrlEs}/preguntas-de-entrevistas-de-angular/",
+        $"{BaseUrlEs}/preguntas-de-entrevista-de-java/",
+        // Inglés
+        $"{BaseUrlEn}/javascript-interview-questions-and-answers/",
+        $"{BaseUrlEn}/python-interview-questions-and-answers/",
+        $"{BaseUrlEn}/react-interview-questions-and-answers/",
+        $"{BaseUrlEn}/sql-interview-questions/",
+        $"{BaseUrlEn}/css-interview-questions-and-answers/",
+        $"{BaseUrlEn}/html-interview-questions-and-answers/",
+        $"{BaseUrlEn}/java-interview-questions-and-answers/",
+        $"{BaseUrlEn}/common-coding-interview-questions/",
+        $"{BaseUrlEn}/software-engineering-interview-questions/"
     };
 
     public override string SourceName => "FreeCodeCamp";
@@ -64,7 +85,7 @@ public class FreeCodeCampScraper : BaseScraper
         var result = new ScrapingResult();
         var processedUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        Logger.LogInformation("[FreeCodeCamp] Iniciando scraping de FreeCodeCamp Español...");
+        Logger.LogInformation("[FreeCodeCamp] Iniciando scraping bilingüe (ES + EN)...");
 
         try
         {
@@ -188,7 +209,7 @@ public class FreeCodeCampScraper : BaseScraper
                 sourceId: 0,
                 answerText: answerText
             );
-            scrapedQuestion.OriginalLanguage = "es"; // Sabemos que es español
+            // CreateScrapedQuestion ya detecta el idioma automáticamente
             result.Questions.Add(scrapedQuestion);
         }
 
@@ -234,17 +255,19 @@ public class FreeCodeCampScraper : BaseScraper
             {
                 var href = link.GetAttributeValue("href", "");
 
-                // Solo enlaces a artículos de FreeCodeCamp Español
+                // Solo enlaces a artículos de FreeCodeCamp (Español o Inglés)
                 if (string.IsNullOrEmpty(href)) continue;
 
                 // Normalizar URL
-                if (href.StartsWith("/espanol/news/") && !href.Contains("/search/") && !href.Contains("/tag/") && !href.Contains("/page/"))
+                if ((href.StartsWith("/espanol/news/") || href.StartsWith("/news/")) &&
+                    !href.Contains("/search/") && !href.Contains("/tag/") && !href.Contains("/page/"))
                 {
                     var fullUrl = $"https://www.freecodecamp.org{href}";
                     if (!urls.Contains(fullUrl))
                         urls.Add(fullUrl);
                 }
-                else if (href.StartsWith("https://www.freecodecamp.org/espanol/news/") &&
+                else if ((href.StartsWith("https://www.freecodecamp.org/espanol/news/") ||
+                          href.StartsWith("https://www.freecodecamp.org/news/")) &&
                          !href.Contains("/search/") && !href.Contains("/tag/") && !href.Contains("/page/"))
                 {
                     if (!urls.Contains(href))
@@ -282,31 +305,49 @@ public class FreeCodeCampScraper : BaseScraper
 
         try
         {
-            // Ghost Content API público de FreeCodeCamp (no requiere API key para búsqueda pública)
-            // Formato: https://www.freecodecamp.org/espanol/news/ghost/api/v3/content/posts/?key=...
-            // Alternativa: scrape la página de noticias y filtrar por tag
-            var tagUrl = $"{BaseUrl}/tag/entrevistas/";
-            await ApplyRateLimitAsync(ct);
-
-            HttpClient.DefaultRequestHeaders.Clear();
-            HttpClient.DefaultRequestHeaders.Add("User-Agent", GetRandomUserAgent());
-
-            var response = await HttpClient.GetAsync(tagUrl, ct);
-            if (!response.IsSuccessStatusCode) return urls;
-
-            var html = await response.Content.ReadAsStringAsync(ct);
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-
-            var linkNodes = doc.DocumentNode.SelectNodes("//a[@href]");
-            if (linkNodes == null) return urls;
-
-            foreach (var link in linkNodes)
+            // Ghost Content API público de FreeCodeCamp
+            // Buscar en tags de entrevistas en español e inglés
+            var tagUrls = new[]
             {
-                var href = link.GetAttributeValue("href", "");
-                if (href.StartsWith("/espanol/news/") && !href.Contains("/tag/") && !href.Contains("/page/"))
+                $"{BaseUrlEs}/tag/entrevistas/",
+                $"{BaseUrlEn}/tag/interview/",
+                $"{BaseUrlEn}/tag/interviews/"
+            };
+
+            foreach (var tagUrl in tagUrls)
+            {
+                try
                 {
-                    urls.Add($"https://www.freecodecamp.org{href}");
+                    await ApplyRateLimitAsync(ct);
+
+                    HttpClient.DefaultRequestHeaders.Clear();
+                    HttpClient.DefaultRequestHeaders.Add("User-Agent", GetRandomUserAgent());
+
+                    var response = await HttpClient.GetAsync(tagUrl, ct);
+                    if (!response.IsSuccessStatusCode) continue;
+
+                    var html = await response.Content.ReadAsStringAsync(ct);
+                    var doc = new HtmlDocument();
+                    doc.LoadHtml(html);
+
+                    var linkNodes = doc.DocumentNode.SelectNodes("//a[@href]");
+                    if (linkNodes == null) continue;
+
+                    foreach (var link in linkNodes)
+                    {
+                        var href = link.GetAttributeValue("href", "");
+                        if ((href.StartsWith("/espanol/news/") || href.StartsWith("/news/")) &&
+                            !href.Contains("/tag/") && !href.Contains("/page/"))
+                        {
+                            var fullUrl = $"https://www.freecodecamp.org{href}";
+                            if (!urls.Contains(fullUrl))
+                                urls.Add(fullUrl);
+                        }
+                    }
+                }
+                catch (Exception ex2)
+                {
+                    Logger.LogDebug(ex2, "[FreeCodeCamp] Error buscando en tag {Url}", tagUrl);
                 }
             }
         }

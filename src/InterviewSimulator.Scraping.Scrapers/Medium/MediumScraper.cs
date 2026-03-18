@@ -15,15 +15,20 @@ public class MediumScraper : BaseScraper
 {
     private static readonly string[] TagUrls =
     {
-        // Solo tags en español — evita descargar contenido inglés
+        // Tags en español
         "https://medium.com/tag/entrevista-tecnica",
         "https://medium.com/tag/preguntas-entrevista",
         "https://medium.com/tag/programacion",
         "https://medium.com/tag/desarrollo-web",
-        "https://medium.com/tag/desarrollo-de-software"
+        "https://medium.com/tag/desarrollo-de-software",
+        // Tags en inglés
+        "https://medium.com/tag/interview-questions",
+        "https://medium.com/tag/coding-interviews",
+        "https://medium.com/tag/software-engineering",
+        "https://medium.com/tag/programming",
+        "https://medium.com/tag/software-development",
+        "https://medium.com/tag/web-development"
     };
-
-    private const bool SpanishOnly = true;
 
     public override string SourceName => "Medium";
     public override SourceType SourceType => SourceType.BlogPlatform;
@@ -145,14 +150,6 @@ public class MediumScraper : BaseScraper
 
                             if (!string.IsNullOrWhiteSpace(content))
                             {
-                                // Filtrar por idioma: solo español
-                                if (SpanishOnly && !IsSpanishText(content))
-                                {
-                                    Logger.LogDebug("[Medium] Artículo descartado (no es español): {Url}", articleUrl);
-                                    await articlePage.CloseAsync();
-                                    continue;
-                                }
-
                                 // Extraer solo Q+A (preguntas con respuesta)
                                 var qaPairs = ExtractQuestionsWithAnswersFromText(content);
 

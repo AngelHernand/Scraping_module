@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InterviewSimulator.RAG.Core\InterviewSimulator.RAG.Core.csproj" />
+    <ProjectReference Include="..\InterviewSimulator.Scraping.Core\InterviewSimulator.Scraping.Core.csproj" />
+    <ProjectReference Include="..\InterviewSimulator.Scraping.Classifier\InterviewSimulator.Scraping.Classifier.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.*" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.*" />
+  </ItemGroup>
+
+</Project>

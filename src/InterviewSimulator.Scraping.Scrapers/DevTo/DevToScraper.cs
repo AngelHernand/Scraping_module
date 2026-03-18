@@ -17,20 +17,22 @@ public class DevToScraper : BaseScraper
 {
     private const string BaseApiUrl = "https://dev.to/api/articles";
 
-    // Solo tags en español / comunidad hispana en Dev.to
+    // Tags para buscar artículos de entrevistas técnicas
     private static readonly string[] PrimaryTags =
     {
+        // Tags en español / comunidad hispana
         "spanish", "espanol", "programacion", "desarrollo",
-        "entrevista", "preguntas", "tutorial",
-        "aprendizaje", "tecnologia", "webdev",
-        "codenewbie", "beginners" // tags comunes donde hay contenido en español
+        "entrevista", "preguntas",
+        // Tags en inglés (alto volumen de contenido IT)
+        "interview", "interviewquestions", "codinginterview",
+        "programming", "softwareengineering", "webdev",
+        "javascript", "python", "java", "csharp", "dotnet",
+        "react", "angular", "node", "typescript",
+        "devops", "docker", "kubernetes", "aws", "azure",
+        "sql", "database", "algorithms", "datastructures",
+        "systemdesign", "backend", "frontend",
+        "codenewbie", "beginners", "tutorial"
     };
-
-    // Sin tags secundarios en inglés — evita descargar miles de artículos irrelevantes
-    private static readonly string[] SecondaryTags = Array.Empty<string>();
-
-    // Solo procesa artículos detectados como español
-    private const bool SpanishOnly = true;
 
     public override string SourceName => "DevTo";
     public override SourceType SourceType => SourceType.BlogPlatform;
@@ -54,7 +56,7 @@ public class DevToScraper : BaseScraper
 
         try
         {
-            var allTags = PrimaryTags.Concat(SecondaryTags).ToArray();
+            var allTags = PrimaryTags;
 
             foreach (var tag in allTags)
             {
@@ -63,7 +65,6 @@ public class DevToScraper : BaseScraper
                 try
                 {
                     Logger.LogInformation("[DevTo] Buscando artículos con tag: {Tag}", tag);
-                    int spanishFoundInTag = 0;
                     int consecutiveEmptyPages = 0;
 
                     for (int page = 1; page <= maxPages; page++)
@@ -73,7 +74,7 @@ public class DevToScraper : BaseScraper
                         var articles = await FetchArticlesByTagAsync(tag, page, cancellationToken);
                         if (articles == null || articles.Count == 0) break;
 
-                        int spanishInPage = 0;
+                        int articlesInPage = 0;
 
                         foreach (var article in articles)
                         {
@@ -81,31 +82,20 @@ public class DevToScraper : BaseScraper
 
                             try
                             {
-                                // Pre-filtro rápido por título/descripción (evita descargar el body completo)
-                                if (SpanishOnly)
-                                {
-                                    var preview = $"{article.Title} {article.Description}";
-                                    if (!IsSpanishText(preview))
-                                    {
-                                        Logger.LogDebug("[DevTo] Artículo '{Title}' descartado rápido (título no es español)", article.Title);
-                                        continue;
-                                    }
-                                }
-
                                 // Obtener body completo del artículo
                                 await ApplyRateLimitAsync(cancellationToken);
                                 var fullArticle = await FetchFullArticleAsync(article.Id, cancellationToken);
 
                                 if (fullArticle?.BodyHtml == null) continue;
 
-                                // Filtrar por idioma: solo español si SpanishOnly está activo
-                                if (SpanishOnly && !IsSpanishText(fullArticle.BodyHtml))
+                                // Rechazar portugués (no útil para nuestro sistema)
+                                if (DetectLanguage(fullArticle.BodyHtml) == "pt")
                                 {
-                                    Logger.LogDebug("[DevTo] Artículo '{Title}' descartado (no es español)", article.Title);
+                                    Logger.LogDebug("[DevTo] Artículo '{Title}' descartado (portugués)", article.Title);
                                     continue;
                                 }
 
-                                spanishInPage++;
+                                articlesInPage++;
 
                                 // Extraer solo preguntas CON respuestas del contenido
                                 var qaPairs = ExtractQuestionsWithAnswersFromText(fullArticle.BodyHtml);
@@ -144,23 +134,21 @@ public class DevToScraper : BaseScraper
                         // Rate limit de Dev.to: 30 requests por 30 segundos
                         await Task.Delay(1500, cancellationToken);
 
-                        // Corte inteligente: si una página no tuvo artículos en español, incrementar contador
-                        if (spanishInPage == 0)
+                        // Corte inteligente: si una página no tuvo artículos válidos, incrementar contador
+                        if (articlesInPage == 0)
                             consecutiveEmptyPages++;
                         else
                             consecutiveEmptyPages = 0;
 
-                        spanishFoundInTag += spanishInPage;
-
-                        // Si 2 páginas consecutivas sin contenido español, pasar al siguiente tag
+                        // Si 2 páginas consecutivas sin contenido válido, pasar al siguiente tag
                         if (consecutiveEmptyPages >= 2)
                         {
-                            Logger.LogInformation("[DevTo] Tag '{Tag}' sin contenido español en {Pages} páginas consecutivas, saltando", tag, consecutiveEmptyPages);
+                            Logger.LogInformation("[DevTo] Tag '{Tag}' sin contenido válido en {Pages} páginas consecutivas, saltando", tag, consecutiveEmptyPages);
                             break;
                         }
                     }
 
-                    Logger.LogInformation("[DevTo] Tag '{Tag}': {Count} artículos en español encontrados", tag, spanishFoundInTag);
+                    Logger.LogInformation("[DevTo] Tag '{Tag}': procesado", tag);
                 }
                 catch (Exception ex)
                 {

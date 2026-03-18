@@ -1,0 +1,13 @@
+{
+  "solution": {
+    "path": "Web-scraping_module.sln",
+    "projects": [
+      "src\\InterviewSimulator.Scraping.Core\\InterviewSimulator.Scraping.Core.csproj",
+      "src\\InterviewSimulator.Scraping.Classifier\\InterviewSimulator.Scraping.Classifier.csproj",
+      "src\\InterviewSimulator.Scraping.Data\\InterviewSimulator.Scraping.Data.csproj",
+      "src\\InterviewSimulator.Scraping.Scrapers\\InterviewSimulator.Scraping.Scrapers.csproj",
+      "src\\InterviewSimulator.Scraping.Worker\\InterviewSimulator.Scraping.Worker.csproj",
+      "tests\\InterviewSimulator.Scraping.Tests.Unit\\InterviewSimulator.Scraping.Tests.Unit.csproj"
+    ]
+  }
+}
