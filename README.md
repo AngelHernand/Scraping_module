@@ -1,103 +1,87 @@
-# Web Scraping Module – Interview Simulator
+# Web Scraping + RAG Pipeline — Interview Simulator
 
-Módulo de scraping para el **Interview Simulator**. Extrae, clasifica y almacena preguntas de entrevista desde 5 fuentes web de forma automatizada.
+Módulo de scraping y pipeline RAG para el **Interview Simulator**. Extrae, clasifica y almacena preguntas de entrevista técnica desde 30+ fuentes web (español e inglés), genera embeddings vectoriales con OpenAI y los almacena en Qdrant para búsqueda semántica.
 
-## Arquitectura
+> Para una descripción exhaustiva del proyecto, ver [CONTEXTO_PROYECTO.md](CONTEXTO_PROYECTO.md).
 
-```
-Web-scraping_module.sln
-├── src/
-│   ├── InterviewSimulator.Scraping.Core        # Modelos, Enums, Interfaces, Configuración
-│   ├── InterviewSimulator.Scraping.Data         # EF Core DbContext, Repositorios
-│   ├── InterviewSimulator.Scraping.Classifier   # Clasificador por keywords/regex
-│   ├── InterviewSimulator.Scraping.Scrapers     # 5 scrapers + Orchestrator
-│   └── InterviewSimulator.Scraping.Worker       # Background Service (punto de entrada)
-└── tests/
-    └── InterviewSimulator.Scraping.Tests.Unit   # Tests unitarios (xUnit)
-```
+---
 
-## Fuentes de scraping
+## Docker (Recomendado)
 
-| Fuente     | Método                | Tipo            |
-|------------|-----------------------|-----------------|
-| Dev.to     | REST API (Forem)      | BlogPlatform    |
-| Medium     | Playwright headless   | BlogPlatform    |
-| LeetCode   | GraphQL API           | CodingPlatform  |
-| Glassdoor  | Playwright + anti-bot | JobBoard        |
-| Indeed     | Playwright headless   | JobBoard        |
+### Requisitos previos
 
-## Requisitos previos
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (incluye Docker Compose v2)
+- API Key de OpenAI (para el RAG Worker)
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- SQL Server (local o remoto)
-- Playwright browsers (se instalan automáticamente en el primer uso)
-
-## Configuración
-
-Editar `appsettings.json` en el proyecto Worker:
-
-```json
-{
-  "ConnectionStrings": {
-    "ScrapingDb": "Server=localhost;Database=InterviewSimulator_Scraping;Trusted_Connection=True;TrustServerCertificate=True;"
-  },
-  "ScrapingSettings": {
-    "EnabledScrapers": ["DevTo"],
-    "CronSchedule": "0 3 * * *"
-  }
-}
-```
-
-### Variables importantes
-
-| Variable                        | Descripción                                    | Default          |
-|---------------------------------|------------------------------------------------|------------------|
-| `EnabledScrapers`               | Lista de scrapers activos                      | `["DevTo"]`      |
-| `CronSchedule`                  | Expresión cron para ejecución programada       | `0 3 * * *`      |
-| `MaxConcurrentScrapers`         | Scrapers ejecutándose en paralelo              | `2`              |
-| `MinDelayBetweenRequestsMs`     | Delay mínimo entre requests (ms)               | `2000`           |
-| `MaxDelayBetweenRequestsMs`     | Delay máximo entre requests (ms)               | `5000`           |
-
-## Compilar
+### Quick Start
 
 ```bash
-dotnet build Web-scraping_module.sln
+# 1. Copiar template de variables de entorno y llenar secrets
+cp .env.example .env
+# Editar .env con tu OPENAI_API_KEY y un SA_PASSWORD fuerte
+
+# 2. Levantar toda la infraestructura
+docker compose up -d
+
+# 3. Ver logs
+docker compose logs scraping-worker -f   # Scraping
+docker compose logs rag-worker -f         # RAG Pipeline
 ```
 
-## Ejecutar
+### Servicios
+
+| Servicio | Puerto | Descripción |
+|---|---|---|
+| `sqlserver` | `1433` | SQL Server 2022 — base de datos relacional |
+| `qdrant` | `6333` (REST), `6334` (gRPC) | Qdrant — base de datos vectorial |
+| `scraping-worker` | — | Worker que scrapea 30+ sitios web (cron 3 AM) |
+| `rag-worker` | — | Pipeline RAG: limpieza → chunking → embeddings → Qdrant (cron 4 AM) |
+
+### Orden de arranque
+
+1. **SQL Server** arranca y pasa health check (~30s)
+2. **Qdrant** arranca (~2s)
+3. **Scraping Worker** arranca → crea tablas en SQL Server → ejecuta scraping
+4. **RAG Worker** arranca → crea tabla ProcessingStatus → procesa datos scrapeados
+
+### Comandos útiles
 
 ```bash
-dotnet run --project src/InterviewSimulator.Scraping.Worker
+# Estado de los servicios
+docker compose ps
+
+# Forzar ejecución del scraping (reinicia el worker)
+docker compose restart scraping-worker
+
+# Forzar ejecución del RAG pipeline
+docker compose restart rag-worker
+
+# Ver dashboard de Qdrant
+# http://localhost:6333/dashboard
+
+# Conectar a SQL Server desde SSMS
+# Server: localhost,1433  |  User: sa  |  Password: (tu SA_PASSWORD)
+
+# Parar todo
+docker compose down
+
+# Parar todo Y borrar datos persistidos
+docker compose down -v
+
+# Reconstruir imágenes (después de cambios en código)
+docker compose up -d --build
 ```
 
-## Tests
+### Variables de entorno (.env)
 
-```bash
-dotnet test
-```
+| Variable | Descripción |
+|---|---|
+| `SA_PASSWORD` | Password del usuario `sa` de SQL Server (mínimo 8 chars, mayúscula, número, símbolo) |
+| `OPENAI_API_KEY` | API Key de OpenAI para generación de embeddings |
 
-## Clasificación de preguntas
+---
 
-El clasificador basado en keywords/regex asigna:
-
-- **Categoría**: Technical, Behavioral, Situational, General
-- **Subcategoría** (solo Technical): Algorithms, DataStructures, Databases, WebDevelopment, SystemDesign, DevOps, Security, Languages, Testing
-- **Dificultad**: Junior, Mid, Senior
-- **Tags**: Palabras clave detectadas en el texto
-
-Las reglas se definen en `classification_rules.json`.
-
-## Deduplicación
-
-- **Capa 1 (Exact Match)**: SHA-256 sobre texto normalizado (lowercase, sin artículos, sin puntuación).
-- Índice único en `HashFingerprint` en la base de datos.
-
-## Stack tecnológico
-
-- **Runtime**: .NET 8.0
-- **ORM**: Entity Framework Core 8.x (SQL Server)
-- **Browser Automation**: Microsoft Playwright
-- **HTML Parsing**: HtmlAgilityPack, AngleSharp
+## Desarrollo local (sin Docker)
 - **Resilience**: Polly (retry + circuit breaker)
 - **Logging**: Serilog (Console + File sinks)
 - **Scheduling**: Cronos (cron expressions)

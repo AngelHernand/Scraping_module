@@ -1,18 +1,72 @@
-version: '3.8'
-
 services:
+
+  # ── SQL Server 2022 ────────────────────────────────────────────────
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: interview-simulator-sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  # ── Qdrant (vector database) ───────────────────────────────────────
   qdrant:
     image: qdrant/qdrant:latest
     container_name: interview-simulator-qdrant
     ports:
-      - "6333:6333"  # REST API
-      - "6334:6334"  # gRPC
+      - "6333:6333"   # REST API
+      - "6334:6334"   # gRPC
     volumes:
       - qdrant_data:/qdrant/storage
     environment:
       - QDRANT__SERVICE__GRPC_PORT=6334
     restart: unless-stopped
 
+  # ── Scraping Worker (.NET 8 + Playwright) ──────────────────────────
+  scraping-worker:
+    build:
+      context: .
+      dockerfile: src/InterviewSimulator.Scraping.Worker/Dockerfile
+    container_name: interview-simulator-scraping
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=InterviewSimulator;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+      - DOTNET_ENVIRONMENT=Production
+    restart: unless-stopped
+
+  # ── RAG Pipeline Worker (.NET 8) ───────────────────────────────────
+  rag-worker:
+    build:
+      context: .
+      dockerfile: src/InterviewSimulator.RAG.Worker/Dockerfile
+    container_name: interview-simulator-rag
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=InterviewSimulator;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+      - Qdrant__Host=qdrant
+      - Qdrant__Port=6333
+      - OpenAI__ApiKey=${OPENAI_API_KEY}
+      - DOTNET_ENVIRONMENT=Production
+    restart: unless-stopped
+
 volumes:
+  sqlserver_data:
+    driver: local
   qdrant_data:
     driver: local
