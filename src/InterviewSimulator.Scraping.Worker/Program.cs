@@ -36,6 +36,7 @@ try
 
     // Repositorio
     builder.Services.AddScoped<IScrapedDataRepository, ScrapedDataRepository>();
+    builder.Services.AddScoped<IBehavioralQuestionRepository, BehavioralQuestionRepository>();
 
     // Clasificadores
     builder.Services.AddSingleton<IQuestionClassifier, KeywordClassifier>();

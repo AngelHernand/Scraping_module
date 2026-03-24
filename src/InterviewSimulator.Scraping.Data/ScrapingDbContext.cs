@@ -16,6 +16,11 @@ public class ScrapingDbContext : DbContext
     public DbSet<ScrapedSource> ScrapedSources => Set<ScrapedSource>();
     public DbSet<ScrapingJob> ScrapingJobs => Set<ScrapingJob>();
 
+    public DbSet<BehavioralQuestion> BehavioralQuestions => Set<BehavioralQuestion>();
+    public DbSet<EvaluationCriteria> EvaluationCriteria => Set<EvaluationCriteria>();
+    public DbSet<RedFlag> RedFlags => Set<RedFlag>();
+    public DbSet<ExampleAnswer> ExampleAnswers => Set<ExampleAnswer>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

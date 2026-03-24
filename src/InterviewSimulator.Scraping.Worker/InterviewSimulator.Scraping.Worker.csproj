@@ -28,4 +28,5 @@
     <ProjectReference Include="..\InterviewSimulator.Scraping.Classifier\InterviewSimulator.Scraping.Classifier.csproj" />
     <ProjectReference Include="..\InterviewSimulator.Scraping.Data\InterviewSimulator.Scraping.Data.csproj" />
   </ItemGroup>
+
 </Project>
