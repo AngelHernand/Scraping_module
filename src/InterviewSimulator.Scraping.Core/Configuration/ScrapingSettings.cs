@@ -15,6 +15,7 @@ public class ScrapingSettings
     public int RequestTimeoutSeconds { get; set; } = 30;
     public int MaxRetries { get; set; } = 3;
     public List<string> UserAgents { get; set; } = new();
+    public List<string> AllowedLanguages { get; set; } = new() { "es", "en" };
     public string CronSchedule { get; set; } = "0 3 * * *";
     public Dictionary<string, ScraperSourceSettings> Scrapers { get; set; } = new();
 }

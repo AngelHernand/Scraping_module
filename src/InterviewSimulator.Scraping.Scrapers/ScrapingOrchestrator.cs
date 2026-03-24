@@ -252,7 +252,7 @@ public class ScrapingOrchestrator : IScrapingOrchestrator
         int duplicates = 0;
         int skippedNoAnswer = 0;
         int skippedNotIT = 0;
-        int skippedNotSpanish = 0;
+        int skippedByLanguage = 0;
 
         foreach (var question in result.Questions)
         {
@@ -267,10 +267,10 @@ public class ScrapingOrchestrator : IScrapingOrchestrator
                     continue;
                 }
 
-                // FILTRO 2: Solo guardar preguntas en español
-                if (question.OriginalLanguage != "es")
+                // FILTRO 2: Solo guardar preguntas en idiomas permitidos (configurable)
+                if (!_settings.AllowedLanguages.Contains(question.OriginalLanguage, StringComparer.OrdinalIgnoreCase))
                 {
-                    skippedNotSpanish++;
+                    skippedByLanguage++;
                     continue;
                 }
 
@@ -312,11 +312,11 @@ public class ScrapingOrchestrator : IScrapingOrchestrator
             }
         }
 
-        if (skippedNoAnswer > 0 || skippedNotIT > 0 || skippedNotSpanish > 0)
+        if (skippedNoAnswer > 0 || skippedNotIT > 0 || skippedByLanguage > 0)
         {
             _logger.LogInformation(
-                "--- Filtros Q&A {Name}: Sin respuesta={NoAns}, No español={NoEs}, No IT={NotIT} ---",
-                sourceName, skippedNoAnswer, skippedNotSpanish, skippedNotIT);
+                "--- Filtros Q&A {Name}: Sin respuesta={NoAns}, Idioma no permitido={NoLang}, No IT={NotIT} ---",
+                sourceName, skippedNoAnswer, skippedByLanguage, skippedNotIT);
         }
 
         return (newQuestions, duplicates);
