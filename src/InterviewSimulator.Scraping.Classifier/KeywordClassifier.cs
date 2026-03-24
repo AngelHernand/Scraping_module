@@ -326,11 +326,9 @@ public class KeywordClassifier : IQuestionClassifier
         " psicología ", " psicológico ", " terapeuta ",
         " ansiedad ", " depresión ", " trauma ",
         // E-commerce / Shopping / Marketplaces
-        " vinted ", " marketplace de ropa ", " artículo infravalorado ",
         " revendedor ", " revendedores ", " gangas ",
         " comprar barato ", " precio entre países ",
-        " mcp server de vinted ", " scraper de vinted ", " vinted scraper ",
-        " apify ", " análisis de competidores ", " monitorear competidores ",
+        " análisis de competidores ", " monitorear competidores ",
         " análisis competitivo ", " investigación de mercado ",
         " app store ", " google play ", " localización de apps ",
         " reseñas de apps ", " ratings de apps ",

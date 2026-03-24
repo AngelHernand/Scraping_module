@@ -121,7 +121,7 @@ public class InterviewBitScraper : BaseScraper
         HttpClient.DefaultRequestHeaders.Add("User-Agent", GetRandomUserAgent());
         HttpClient.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         HttpClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9");
-        HttpClient.DefaultRequestHeaders.Add("Referer", "https://www.interviewbit.com/");
+        HttpClient.DefaultRequestHeaders.Add("Referer", new Uri(url).GetLeftPart(UriPartial.Authority) + "/");
 
         var response = await HttpClient.GetAsync(url, ct);
         if (!response.IsSuccessStatusCode) return 0;

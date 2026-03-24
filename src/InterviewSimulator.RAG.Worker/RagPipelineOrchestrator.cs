@@ -68,20 +68,19 @@ public class RagPipelineOrchestrator : IRagPipelineOrchestrator
             // Asegurar que la colección exista
             await _collectionManager.EnsureCollectionExistsAsync(cancellationToken);
 
-            // Obtener IDs no procesados
-            var unprocessedIds = await _statusRepository.GetUnprocessedScrapedQuestionIdsAsync(
-                _settings.ProcessingBatchSize);
+            // Obtener IDs ya completados o con reintentos agotados (excluir del procesamiento)
+            var excludedIds = await _statusRepository.GetExcludedScrapedQuestionIdsAsync(
+                _settings.MaxRetryCount);
 
-            // También obtener los que fallaron y aún tienen reintentos disponibles
-            var failedStatuses = await _statusRepository.GetPendingOrFailedAsync(
-                _settings.MaxRetryCount, _settings.ProcessingBatchSize);
+            // Buscar ScrapedQuestions candidatos directamente (cross-context query)
+            var questions = await _scrapingDb.ScrapedQuestions
+                .Include(q => q.Source)
+                .Where(q => !excludedIds.Contains(q.Id) && q.IsActive && !q.IsDuplicate)
+                .OrderBy(q => q.Id)
+                .Take(_settings.ProcessingBatchSize)
+                .ToListAsync(cancellationToken);
 
-            var allIds = unprocessedIds
-                .Union(failedStatuses.Select(s => s.ScrapedQuestionId))
-                .Distinct()
-                .ToList();
-
-            if (allIds.Count == 0)
+            if (questions.Count == 0)
             {
                 _logger.LogInformation("No pending ScrapedQuestions to process");
                 sw.Stop();
@@ -89,13 +88,7 @@ public class RagPipelineOrchestrator : IRagPipelineOrchestrator
                 return result;
             }
 
-            _logger.LogInformation("Processing {Count} ScrapedQuestions", allIds.Count);
-
-            // Cargar las ScrapedQuestions
-            var questions = await _scrapingDb.ScrapedQuestions
-                .Include(q => q.Source)
-                .Where(q => allIds.Contains(q.Id) && q.IsActive && !q.IsDuplicate)
-                .ToListAsync(cancellationToken);
+            _logger.LogInformation("Processing {Count} ScrapedQuestions", questions.Count);
 
             foreach (var question in questions)
             {

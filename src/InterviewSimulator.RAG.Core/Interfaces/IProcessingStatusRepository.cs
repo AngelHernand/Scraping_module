@@ -14,5 +14,5 @@ public interface IProcessingStatusRepository
     Task UpdateAsync(ProcessingStatus status);
     Task UpdateStateAsync(int id, ProcessingState state, string? errorMessage = null);
     Task<int> GetCountByStateAsync(ProcessingState state);
-    Task<List<int>> GetUnprocessedScrapedQuestionIdsAsync(int batchSize);
+    Task<HashSet<int>> GetExcludedScrapedQuestionIdsAsync(int maxRetryCount);
 }

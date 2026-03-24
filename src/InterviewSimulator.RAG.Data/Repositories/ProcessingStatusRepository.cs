@@ -68,21 +68,14 @@ public class ProcessingStatusRepository : IProcessingStatusRepository
         return await _context.ProcessingStatuses.CountAsync(p => p.State == state);
     }
 
-    public async Task<List<int>> GetUnprocessedScrapedQuestionIdsAsync(int batchSize)
+    public async Task<HashSet<int>> GetExcludedScrapedQuestionIdsAsync(int maxRetryCount)
     {
-        var processedIds = _context.ProcessingStatuses
-            .Where(p => p.State == ProcessingState.Stored || p.State == ProcessingState.Skipped)
-            .Select(p => p.ScrapedQuestionId);
-
-        // Usamos raw SQL a través del contexto del scraping para obtener IDs no procesados.
-        // Este método será llamado desde el orquestador que tiene acceso a ambos contextos.
-        // Por ahora retornamos IDs pendientes/fallidos del tracking.
-        return await _context.ProcessingStatuses
-            .Where(p => p.State == ProcessingState.Pending
-                     || (p.State == ProcessingState.Failed && p.RetryCount < 3))
-            .OrderBy(p => p.CreatedAt)
-            .Take(batchSize)
+        var ids = await _context.ProcessingStatuses
+            .Where(p => p.State == ProcessingState.Stored
+                     || p.State == ProcessingState.Skipped
+                     || (p.State == ProcessingState.Failed && p.RetryCount >= maxRetryCount))
             .Select(p => p.ScrapedQuestionId)
             .ToListAsync();
+        return ids.ToHashSet();
     }
 }

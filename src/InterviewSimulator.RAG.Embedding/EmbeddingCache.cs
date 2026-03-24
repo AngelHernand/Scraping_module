@@ -7,7 +7,7 @@ namespace InterviewSimulator.RAG.Embedding;
 
 public class EmbeddingCache
 {
-    private readonly ConcurrentDictionary<string, float[]> _cache = new();
+    private readonly ConcurrentDictionary<string, (float[] Vector, long AccessTicks)> _cache = new();
     private readonly ILogger<EmbeddingCache> _logger;
     private readonly int _maxEntries;
 
@@ -20,19 +20,24 @@ public class EmbeddingCache
     public float[]? Get(string text)
     {
         string key = ComputeKey(text);
-        return _cache.TryGetValue(key, out var vector) ? vector : null;
+        if (_cache.TryGetValue(key, out var entry))
+        {
+            _cache[key] = (entry.Vector, DateTime.UtcNow.Ticks);
+            return entry.Vector;
+        }
+        return null;
     }
 
     public void Set(string text, float[] vector)
     {
         if (_cache.Count >= _maxEntries)
         {
-            _logger.LogWarning("Embedding cache full ({Count} entries), clearing oldest half", _cache.Count);
-            ClearHalf();
+            _logger.LogWarning("Embedding cache full ({Count} entries), evicting LRU half", _cache.Count);
+            EvictLruHalf();
         }
 
         string key = ComputeKey(text);
-        _cache.TryAdd(key, vector);
+        _cache.TryAdd(key, (vector, DateTime.UtcNow.Ticks));
     }
 
     public int Count => _cache.Count;
@@ -49,10 +54,15 @@ public class EmbeddingCache
         return Convert.ToHexString(hash);
     }
 
-    private void ClearHalf()
+    /// <summary>Evicts the least-recently-used half of the cache.</summary>
+    private void EvictLruHalf()
     {
-        var keys = _cache.Keys.Take(_cache.Count / 2).ToList();
-        foreach (var key in keys)
+        var toEvict = _cache
+            .OrderBy(kvp => kvp.Value.AccessTicks)
+            .Take(_cache.Count / 2)
+            .Select(kvp => kvp.Key)
+            .ToList();
+        foreach (var key in toEvict)
             _cache.TryRemove(key, out _);
     }
 }

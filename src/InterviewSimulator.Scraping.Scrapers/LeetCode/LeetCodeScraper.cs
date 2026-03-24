@@ -180,8 +180,9 @@ public class LeetCodeScraper : BaseScraper
             Content = JsonContent.Create(requestBody)
         };
 
-        request.Headers.Add("Referer", "https://leetcode.com");
-        request.Headers.Add("Origin", "https://leetcode.com");
+        var baseUri = new Uri(GraphQlEndpoint).GetLeftPart(UriPartial.Authority);
+        request.Headers.Add("Referer", baseUri);
+        request.Headers.Add("Origin", baseUri);
         request.Headers.Add("User-Agent", GetRandomUserAgent());
 
         var response = await HttpClient.SendAsync(request, ct);
