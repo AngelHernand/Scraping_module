@@ -1,71 +1,32 @@
-using Cronos;
 using InterviewSimulator.Scraping.Core.Interfaces;
 
 namespace InterviewSimulator.Scraping.Worker;
 
-// Background Service que ejecuta el scraping según un cron schedule configurado.
-// Usa Cronos para parsear la expresión cron.
+// Background Service que ejecuta el scraping una sola vez y termina el proceso.
 public class ScrapingWorker : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<ScrapingWorker> _logger;
-    private readonly IConfiguration _configuration;
+    private readonly IHostApplicationLifetime _lifetime;
 
     public ScrapingWorker(
         IServiceProvider serviceProvider,
         ILogger<ScrapingWorker> logger,
-        IConfiguration configuration)
+        IHostApplicationLifetime lifetime)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
-        _configuration = configuration;
+        _lifetime = lifetime;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("ScrapingWorker iniciado");
+        _logger.LogInformation("ScrapingWorker iniciado — ejecución única");
 
-        var cronExpression = _configuration.GetValue<string>("ScrapingSettings:CronSchedule") ?? "0 3 * * *";
-        var cron = CronExpression.Parse(cronExpression);
-
-        _logger.LogInformation("Cron schedule: {Cron}", cronExpression);
-
-        // Ejecutar inmediatamente la primera vez
         await RunScrapingAsync(stoppingToken);
 
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            var now = DateTime.UtcNow;
-            var nextOccurrence = cron.GetNextOccurrence(now, TimeZoneInfo.Utc);
-
-            if (nextOccurrence == null)
-            {
-                _logger.LogWarning("No se pudo determinar la próxima ejecución. Esperando 1 hora.");
-                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
-                continue;
-            }
-
-            var delay = nextOccurrence.Value - now;
-            _logger.LogInformation("Próxima ejecución de scraping: {Next} (en {Delay})",
-                nextOccurrence.Value, delay);
-
-            try
-            {
-                await Task.Delay(delay, stoppingToken);
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("ScrapingWorker detenido durante espera");
-                break;
-            }
-
-            if (!stoppingToken.IsCancellationRequested)
-            {
-                await RunScrapingAsync(stoppingToken);
-            }
-        }
-
-        _logger.LogInformation("ScrapingWorker finalizado");
+        _logger.LogInformation("ScrapingWorker finalizado — deteniendo el host");
+        _lifetime.StopApplication();
     }
 
     private async Task RunScrapingAsync(CancellationToken ct)

@@ -27,7 +27,7 @@ services:
       - "6333:6333"   # REST API
       - "6334:6334"   # gRPC
     volumes:
-      - qdrant_data:/qdrant/storage
+      - ./data/qdrant:/qdrant/storage
     environment:
       - QDRANT__SERVICE__GRPC_PORT=6334
     restart: unless-stopped
@@ -44,7 +44,7 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=InterviewSimulator;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
       - DOTNET_ENVIRONMENT=Production
-    restart: unless-stopped
+    restart: "no"
 
   # ── RAG Pipeline Worker (.NET 8) ───────────────────────────────────
   rag-worker:
@@ -57,16 +57,16 @@ services:
         condition: service_healthy
       qdrant:
         condition: service_started
+      scraping-worker:
+        condition: service_completed_successfully
     environment:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=InterviewSimulator;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
       - Qdrant__Host=qdrant
       - Qdrant__Port=6333
       - OpenAI__ApiKey=${OPENAI_API_KEY}
       - DOTNET_ENVIRONMENT=Production
-    restart: unless-stopped
+    restart: "no"
 
 volumes:
   sqlserver_data:
-    driver: local
-  qdrant_data:
     driver: local

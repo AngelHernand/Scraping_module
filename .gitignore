@@ -39,3 +39,8 @@ Desktop.ini
 
 ## Secrets
 .env
+
+# Datos persistentes de Docker (bind mounts)
+data/sqlserver/
+data/qdrant/
+!data/.gitkeep
