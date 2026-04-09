@@ -3,9 +3,9 @@ namespace InterviewSimulator.RAG.Core.Constants;
 public static class RagConstants
 {
     public const string DefaultCollectionName = "interview_questions";
-    public const int DefaultEmbeddingDimensions = 1536;
+    public const int DefaultEmbeddingDimensions = 768;
     public const int LargeEmbeddingDimensions = 3072;
-    public const string SmallModelName = "text-embedding-3-small";
+    public const string SmallModelName = "nomic-embed-text";
     public const string LargeModelName = "text-embedding-3-large";
     public const decimal CostPerMillionTokensSmall = 0.020m;
     public const decimal CostPerMillionTokensLarge = 0.130m;

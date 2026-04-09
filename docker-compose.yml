@@ -1,5 +1,33 @@
 services:
 
+  # ── Ollama (local LLM / embeddings) ────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: interview-simulator-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/tags || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+
+  # ── Pull embedding model into Ollama ───────────────────────────────
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: interview-simulator-ollama-pull
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["ollama", "pull", "nomic-embed-text"]
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    restart: "no"
+
   # ── SQL Server 2022 ────────────────────────────────────────────────
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -59,14 +87,19 @@ services:
         condition: service_started
       scraping-worker:
         condition: service_completed_successfully
+      ollama-pull:
+        condition: service_completed_successfully
     environment:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=InterviewSimulator;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
       - Qdrant__Host=qdrant
       - Qdrant__Port=6333
-      - OpenAI__ApiKey=${OPENAI_API_KEY}
+      - OpenAI__ApiKey=ollama
+      - OpenAI__BaseUrl=http://ollama:11434/v1
       - DOTNET_ENVIRONMENT=Production
     restart: "no"
 
 volumes:
   sqlserver_data:
+    driver: local
+  ollama_data:
     driver: local

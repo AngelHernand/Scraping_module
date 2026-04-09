@@ -128,8 +128,7 @@ public class OpenAIEmbeddingService : IEmbeddingService
         var request = new OpenAIEmbeddingRequest
         {
             Input = texts,
-            Model = _settings.EmbeddingModel,
-            Dimensions = _settings.EmbeddingDimensions
+            Model = _settings.EmbeddingModel
         };
 
         var response = await _httpClient.PostAsJsonAsync("/v1/embeddings", request, cancellationToken);
@@ -172,9 +171,6 @@ public class OpenAIEmbeddingService : IEmbeddingService
 
         [JsonPropertyName("model")]
         public string Model { get; set; } = string.Empty;
-
-        [JsonPropertyName("dimensions")]
-        public int Dimensions { get; set; }
     }
 
     private class OpenAIEmbeddingResponse
